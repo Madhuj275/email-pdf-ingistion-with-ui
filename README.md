@@ -9,7 +9,7 @@ A Next.js application for fetching emails with PDF attachments and storing metad
 - Manual & automatic email checking
 - Simple UI with form validation
 
-## 📋 Prerequisites
+## 👋 Prerequisites
 - Node.js v18+
 - PostgreSQL 14+
 - Windows/Linux/macOS terminal access
@@ -49,7 +49,7 @@ DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/email_pdf_ingest
 mkdir src/app/api/email-ingestion/check-emails, src/lib, public, pdfs -Force
 
 # Create core files
-New-Item src/app/page.tsx, 
+New-Item src/app/page.tsx,
           src/app/api/email-ingestion/route.ts,
           src/app/api/email-ingestion/check-emails/route.ts,
           src/lib/email-client.ts
@@ -103,7 +103,22 @@ Access UI at: `http://localhost:3000`
    - `EmailIngestionConfig`
    - `PDFMetadata`
 
-## 📁 Project Structure
+## 💁‍♂️ Environment Variables
+
+### Required Environment Variables
+Create a `.env` file in the project root and add:
+
+```env
+DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/email_pdf_ingestion?schema=public"
+IMAP_HOST="imap.your-email-provider.com"
+IMAP_PORT=993
+IMAP_USER="your-email@example.com"
+IMAP_PASSWORD="your-email-password"
+```
+- Use App Passwords if required for security.
+- Avoid hardcoding sensitive credentials.
+
+## 📂 Project Structure
 ```
 email-pdf-ingestion/
 ├── prisma/
@@ -126,6 +141,7 @@ email-pdf-ingestion/
 ## 🚨 Troubleshooting
 
 ### Common Issues
+
 1. **No PDFs Downloaded**
    - Verify email has PDF attachments
    - Check server logs for errors
@@ -152,3 +168,35 @@ email-pdf-ingestion/
    rm -rf .next
    npm run dev
    ```
+
+## 🌟 Test Steps to Confirm PDFs are Downloaded
+
+1. **Trigger Email Fetching**
+   - Manually click "Check Emails Now" or wait for auto-fetch.
+
+2. **Verify PDF Storage**
+   - Navigate to the `pdfs/` directory.
+   ```bash
+   ls ./pdfs/
+   ```
+   - Ensure expected PDFs are present.
+
+3. **Check Server Logs**
+   ```bash
+   npm run dev
+   ```
+   - Look for logs confirming PDF download success.
+
+4. **Confirm Database Entries**
+   - Open Prisma Studio:
+   ```bash
+   npx prisma studio
+   ```
+   - Verify PDFs are listed under `PDFMetadata`.
+
+5. **Test Opening PDFs**
+   - Manually open a sample PDF to ensure it is correctly downloaded and not corrupted.
+
+
+
+
