@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Email & PDF Ingestion System
 
-## Getting Started
+A Next.js application for fetching emails with PDF attachments and storing metadata in PostgreSQL.
 
-First, run the development server:
+## 🚀 Features
+- Add/Edit/Delete email configurations (IMAP/POP3)
+- Auto-download PDF attachments to `./pdfs/`
+- Store metadata: sender, date, subject, filename
+- Manual & automatic email checking
+- Simple UI with form validation
 
+## 📋 Prerequisites
+- Node.js v18+
+- PostgreSQL 14+
+- Windows/Linux/macOS terminal access
+
+## 🛠️ Setup Guide
+
+### 1. Clone Project
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Madhuj275/email-pdf-ingestion.git
+cd email-pdf-ingestion
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install @prisma/client imapflow
+npm install -D prisma typescript @types/node
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Database Setup
+1. **Install PostgreSQL**  
+   
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Create Database**
+```bash
+createdb email_pdf_ingestion
+```
 
-## Learn More
+3. **Configure Environment**  
+   Create `.env` file:
+```env
+DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/email_pdf_ingestion?schema=public"
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Project Structure Setup (Windows)
+```powershell
+# Create directories
+mkdir src/app/api/email-ingestion/check-emails, src/lib, public, pdfs -Force
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Create core files
+New-Item src/app/page.tsx, 
+          src/app/api/email-ingestion/route.ts,
+          src/app/api/email-ingestion/check-emails/route.ts,
+          src/lib/email-client.ts
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. Run Migrations
+```bash
+npx prisma migrate dev --name init
+```
 
-## Deploy on Vercel
+### 6. Create PDF Directory
+```bash
+mkdir pdfs
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Running the Application
+```bash
+npm run dev
+```
+Access UI at: `http://localhost:3000`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚙️ Configuration
+
+### 1. Add Email Account
+1. Go to `http://localhost:3000`
+2. Fill form:
+   - **Email Address**: your@email.com
+   - **Connection Type**: IMAP
+   - **Host**: imap.your-provider.com
+   - **Port**: 993 (IMAP) / 995 (POP3)
+   - **Username/Password**: Your email credentials
+
+### 2. Check Emails
+- **Manual**: Click "Check Emails Now"
+- **Automatic**: Checks every 5 minutes (default)
+
+## ✅ Verification
+
+1. **Check PDFs**  
+   All attachments will be saved in:
+   ```bash
+   ./pdfs/
+   ```
+
+2. **Check Database**  
+   Use Prisma Studio:
+   ```bash
+   npx prisma studio
+   ```
+   Verify entries in:
+   - `EmailIngestionConfig`
+   - `PDFMetadata`
+
+## 📁 Project Structure
+```
+email-pdf-ingestion/
+├── prisma/
+│   └── schema.prisma       # Database schema
+├── src/
+│   ├── app/
+│   │   ├── page.tsx        # Main UI
+│   │   └── api/
+│   │       └── email-ingestion/
+│   │           ├── route.ts             # CRUD operations
+│   │           └── check-emails/
+│   │               └── route.ts         # Email checking endpoint
+│   └── lib/
+│       ├── email-client.ts # IMAP handling
+│       └── types.ts        # TypeScript interfaces
+├── public/                 # Static assets
+└── pdfs/                   # PDF storage
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+1. **No PDFs Downloaded**
+   - Verify email has PDF attachments
+   - Check server logs for errors
+   - Ensure `pdfs` directory has write permissions
+
+2. **Database Connection Failed**
+   ```bash
+   psql -U postgres -d email_pdf_ingestion
+   ```
+   - Confirm PostgreSQL service is running
+   - Validate credentials in `.env`
+
+3. **IMAP Connection Issues**
+   - Test credentials with email client
+   - Allow "Less Secure Apps" for Gmail
+   ```bash
+   # Enable if using App Password
+   https://myaccount.google.com/security
+   ```
+
+4. **TypeScript Errors**
+   ```bash
+   npx prisma generate
+   rm -rf .next
+   npm run dev
+   ```
